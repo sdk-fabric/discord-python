@@ -2,7 +2,7 @@
   "type": "client-python",
   "require": {
     "sdkfabric/discord": {
-      "target": "./src"
+      "target": "./src/sdk"
     }
   }
 }
