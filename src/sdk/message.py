@@ -15,4 +15,6 @@ class Message(BaseModel):
     embeds: Optional[List[MessageEmbed]] = Field(default=None, alias="embeds")
     allowed_mentions: Optional[MessageAllowedMentions] = Field(default=None, alias="allowed_mentions")
     message_reference: Optional[str] = Field(default=None, alias="message_reference")
+    flags: Optional[int] = Field(default=None, alias="flags")
+    enforce_nonce: Optional[bool] = Field(default=None, alias="enforce_nonce")
     pass
