@@ -8,6 +8,7 @@ import sdkgen
 from requests import RequestException
 from typing import List
 
+from .channel import Channel
 from .channel_message_tag import ChannelMessageTag
 from .message import Message
 
@@ -21,6 +22,32 @@ class ChannelTag(sdkgen.TagAbstract):
             self.parser
         )
 
+
+    def get(self, channel_id: str) -> Channel:
+        """
+        Get a channel by ID. Returns a channel object.
+        """
+        try:
+            path_params = {}
+            path_params["channel_id"] = channel_id
+
+            query_params = {}
+
+            query_struct_names = []
+
+            url = self.parser.url("/channels/:channel_id", path_params)
+
+            headers = {}
+
+            response = self.http_client.get(url, headers=headers, params=self.parser.query(query_params, query_struct_names))
+
+            if response.status_code >= 200 and response.status_code < 300:
+                return Channel.model_validate_json(json_data=response.content)
+
+
+            raise sdkgen.UnknownStatusCodeException("The server returned an unknown status code")
+        except RequestException as e:
+            raise sdkgen.ClientException("An unknown error occurred: " + str(e))
 
     def get_pins(self, channel_id: str) -> List[Message]:
         """
