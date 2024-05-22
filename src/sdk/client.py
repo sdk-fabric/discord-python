@@ -23,6 +23,6 @@ class Client(sdkgen.ClientAbstract):
 
 
     @staticmethod
-    def build(clientId: str, clientSecret: str, tokenStore: sdkgen.TokenStoreInterface, scopes: List[str]):
-        return Client("https://discord.com/api/v10", sdkgen.OAuth2(clientId, clientSecret, "https://discord.com/api/oauth2/token", "https://discord.com/oauth2/authorize", tokenStore, scopes))
+    def build(token: str):
+        return Client("https://discord.com/api/v10", sdkgen.HttpBearer(token))
 

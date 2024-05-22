@@ -10,6 +10,7 @@ from typing import List
 
 from .channel import Channel
 from .channel_message_tag import ChannelMessageTag
+from .channel_reaction_tag import ChannelReactionTag
 from .message import Message
 
 class ChannelTag(sdkgen.TagAbstract):
@@ -18,6 +19,12 @@ class ChannelTag(sdkgen.TagAbstract):
 
     def message(self) -> ChannelMessageTag:
         return ChannelMessageTag(
+            self.http_client,
+            self.parser
+        )
+
+    def reaction(self) -> ChannelReactionTag:
+        return ChannelReactionTag(
             self.http_client,
             self.parser
         )
