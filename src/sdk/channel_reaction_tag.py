@@ -43,4 +43,28 @@ class ChannelReactionTag(sdkgen.TagAbstract):
         except RequestException as e:
             raise sdkgen.ClientException("An unknown error occurred: " + str(e))
 
+    def delete_all(self, channel_id: str, message_id: str):
+        try:
+            path_params = {}
+            path_params["channel_id"] = channel_id
+            path_params["message_id"] = message_id
+
+            query_params = {}
+
+            query_struct_names = []
+
+            url = self.parser.url("/channels/:channel_id/messages/:message_id/reactions", path_params)
+
+            headers = {}
+
+            response = self.http_client.delete(url, headers=headers, params=self.parser.query(query_params, query_struct_names))
+
+            if response.status_code >= 200 and response.status_code < 300:
+                return
+
+
+            raise sdkgen.UnknownStatusCodeException("The server returned an unknown status code")
+        except RequestException as e:
+            raise sdkgen.ClientException("An unknown error occurred: " + str(e))
+
 
