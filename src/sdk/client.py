@@ -9,6 +9,7 @@ from requests import RequestException
 from typing import List
 
 from .channel_tag import ChannelTag
+from .user_tag import UserTag
 
 class Client(sdkgen.ClientAbstract):
     def __init__(self, base_url: str, credentials: sdkgen.CredentialsInterface):
@@ -16,6 +17,12 @@ class Client(sdkgen.ClientAbstract):
 
     def channel(self) -> ChannelTag:
         return ChannelTag(
+            self.http_client,
+            self.parser
+        )
+
+    def user(self) -> UserTag:
+        return UserTag(
             self.http_client,
             self.parser
         )

@@ -8,6 +8,7 @@ import sdkgen
 from requests import RequestException
 from typing import List
 
+from .error_exception import ErrorException
 from .user import User
 
 class ChannelReactionTag(sdkgen.TagAbstract):
@@ -38,6 +39,12 @@ class ChannelReactionTag(sdkgen.TagAbstract):
             if response.status_code >= 200 and response.status_code < 300:
                 return List[User].model_validate_json(json_data=response.content)
 
+            if response.status_code == 400:
+                raise ErrorException(response.content)
+            if response.status_code == 404:
+                raise ErrorException(response.content)
+            if response.status_code == 500:
+                raise ErrorException(response.content)
 
             raise sdkgen.UnknownStatusCodeException("The server returned an unknown status code")
         except RequestException as e:
@@ -62,6 +69,12 @@ class ChannelReactionTag(sdkgen.TagAbstract):
             if response.status_code >= 200 and response.status_code < 300:
                 return
 
+            if response.status_code == 400:
+                raise ErrorException(response.content)
+            if response.status_code == 404:
+                raise ErrorException(response.content)
+            if response.status_code == 500:
+                raise ErrorException(response.content)
 
             raise sdkgen.UnknownStatusCodeException("The server returned an unknown status code")
         except RequestException as e:
