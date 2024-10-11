@@ -11,6 +11,7 @@ from typing import List
 from .channel import Channel
 from .channel_message_tag import ChannelMessageTag
 from .channel_reaction_tag import ChannelReactionTag
+from .error_exception import ErrorException
 from .message import Message
 
 class ChannelTag(sdkgen.TagAbstract):
@@ -51,6 +52,12 @@ class ChannelTag(sdkgen.TagAbstract):
             if response.status_code >= 200 and response.status_code < 300:
                 return Channel.model_validate_json(json_data=response.content)
 
+            if response.status_code == 400:
+                raise ErrorException(response.content)
+            if response.status_code == 404:
+                raise ErrorException(response.content)
+            if response.status_code == 500:
+                raise ErrorException(response.content)
 
             raise sdkgen.UnknownStatusCodeException("The server returned an unknown status code")
         except RequestException as e:
@@ -77,6 +84,12 @@ class ChannelTag(sdkgen.TagAbstract):
             if response.status_code >= 200 and response.status_code < 300:
                 return List[Message].model_validate_json(json_data=response.content)
 
+            if response.status_code == 400:
+                raise ErrorException(response.content)
+            if response.status_code == 404:
+                raise ErrorException(response.content)
+            if response.status_code == 500:
+                raise ErrorException(response.content)
 
             raise sdkgen.UnknownStatusCodeException("The server returned an unknown status code")
         except RequestException as e:
