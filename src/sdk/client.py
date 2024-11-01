@@ -7,8 +7,12 @@ import requests
 import sdkgen
 from requests import RequestException
 from typing import List
+from typing import Dict
+from typing import Any
+from urllib.parse import parse_qs
 
 from .channel_tag import ChannelTag
+from .message_tag import MessageTag
 from .user_tag import UserTag
 
 class Client(sdkgen.ClientAbstract):
@@ -17,6 +21,12 @@ class Client(sdkgen.ClientAbstract):
 
     def channel(self) -> ChannelTag:
         return ChannelTag(
+            self.http_client,
+            self.parser
+        )
+
+    def message(self) -> MessageTag:
+        return MessageTag(
             self.http_client,
             self.parser
         )
@@ -33,3 +43,7 @@ class Client(sdkgen.ClientAbstract):
     def build(token: str):
         return Client("https://discord.com/api/v10", sdkgen.HttpBearer(token))
 
+
+    @staticmethod
+    def buildAnonymous():
+        return Client("https://discord.com/api/v10", sdkgen.Anonymous())

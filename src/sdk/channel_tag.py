@@ -7,28 +7,17 @@ import requests
 import sdkgen
 from requests import RequestException
 from typing import List
+from typing import Dict
+from typing import Any
+from urllib.parse import parse_qs
 
 from .channel import Channel
-from .channel_message_tag import ChannelMessageTag
-from .channel_reaction_tag import ChannelReactionTag
 from .error_exception import ErrorException
 from .message import Message
 
 class ChannelTag(sdkgen.TagAbstract):
     def __init__(self, http_client: requests.Session, parser: sdkgen.Parser):
         super().__init__(http_client, parser)
-
-    def message(self) -> ChannelMessageTag:
-        return ChannelMessageTag(
-            self.http_client,
-            self.parser
-        )
-
-    def reaction(self) -> ChannelReactionTag:
-        return ChannelReactionTag(
-            self.http_client,
-            self.parser
-        )
 
 
     def get(self, channel_id: str) -> Channel:
@@ -37,31 +26,46 @@ class ChannelTag(sdkgen.TagAbstract):
         """
         try:
             path_params = {}
-            path_params["channel_id"] = channel_id
+            path_params['channel_id'] = channel_id
 
             query_params = {}
 
             query_struct_names = []
 
-            url = self.parser.url("/channels/:channel_id", path_params)
+            url = self.parser.url('/channels/:channel_id', path_params)
 
-            headers = {}
+            options = {}
+            options['headers'] = {}
+            options['params'] = self.parser.query(query_params, query_struct_names)
 
-            response = self.http_client.get(url, headers=headers, params=self.parser.query(query_params, query_struct_names))
+
+
+            response = self.http_client.request('GET', url, **options)
 
             if response.status_code >= 200 and response.status_code < 300:
-                return Channel.model_validate_json(json_data=response.content)
+                data = Channel.model_validate_json(json_data=response.content)
 
-            if response.status_code == 400:
-                raise ErrorException(response.content)
-            if response.status_code == 404:
-                raise ErrorException(response.content)
-            if response.status_code == 500:
-                raise ErrorException(response.content)
+                return data
 
-            raise sdkgen.UnknownStatusCodeException("The server returned an unknown status code")
+            statusCode = response.status_code
+            if statusCode == 400:
+                data = Error.model_validate_json(json_data=response.content)
+
+                raise ErrorException(data)
+
+            if statusCode == 404:
+                data = Error.model_validate_json(json_data=response.content)
+
+                raise ErrorException(data)
+
+            if statusCode == 500:
+                data = Error.model_validate_json(json_data=response.content)
+
+                raise ErrorException(data)
+
+            raise sdkgen.UnknownStatusCodeException('The server returned an unknown status code: ' + str(statusCode))
         except RequestException as e:
-            raise sdkgen.ClientException("An unknown error occurred: " + str(e))
+            raise sdkgen.ClientException('An unknown error occurred: ' + str(e))
 
     def get_pins(self, channel_id: str) -> List[Message]:
         """
@@ -69,30 +73,46 @@ class ChannelTag(sdkgen.TagAbstract):
         """
         try:
             path_params = {}
-            path_params["channel_id"] = channel_id
+            path_params['channel_id'] = channel_id
 
             query_params = {}
 
             query_struct_names = []
 
-            url = self.parser.url("/channels/:channel_id/pins", path_params)
+            url = self.parser.url('/channels/:channel_id/pins', path_params)
 
-            headers = {}
+            options = {}
+            options['headers'] = {}
+            options['params'] = self.parser.query(query_params, query_struct_names)
 
-            response = self.http_client.get(url, headers=headers, params=self.parser.query(query_params, query_struct_names))
+
+
+            response = self.http_client.request('GET', url, **options)
 
             if response.status_code >= 200 and response.status_code < 300:
-                return List[Message].model_validate_json(json_data=response.content)
+                data = List[Message].model_validate_json(json_data=response.content)
 
-            if response.status_code == 400:
-                raise ErrorException(response.content)
-            if response.status_code == 404:
-                raise ErrorException(response.content)
-            if response.status_code == 500:
-                raise ErrorException(response.content)
+                return data
 
-            raise sdkgen.UnknownStatusCodeException("The server returned an unknown status code")
+            statusCode = response.status_code
+            if statusCode == 400:
+                data = Error.model_validate_json(json_data=response.content)
+
+                raise ErrorException(data)
+
+            if statusCode == 404:
+                data = Error.model_validate_json(json_data=response.content)
+
+                raise ErrorException(data)
+
+            if statusCode == 500:
+                data = Error.model_validate_json(json_data=response.content)
+
+                raise ErrorException(data)
+
+            raise sdkgen.UnknownStatusCodeException('The server returned an unknown status code: ' + str(statusCode))
         except RequestException as e:
-            raise sdkgen.ClientException("An unknown error occurred: " + str(e))
+            raise sdkgen.ClientException('An unknown error occurred: ' + str(e))
+
 
 
