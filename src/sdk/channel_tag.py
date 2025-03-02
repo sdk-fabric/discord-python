@@ -12,6 +12,8 @@ from typing import Any
 from urllib.parse import parse_qs
 
 from .channel import Channel
+from .channel_update import ChannelUpdate
+from .error import Error
 from .error_exception import ErrorException
 from .message import Message
 
@@ -48,17 +50,46 @@ class ChannelTag(sdkgen.TagAbstract):
                 return data
 
             statusCode = response.status_code
-            if statusCode == 400:
+            if statusCode >= 0 and statusCode <= 999:
                 data = Error.model_validate_json(json_data=response.content)
 
                 raise ErrorException(data)
 
-            if statusCode == 404:
-                data = Error.model_validate_json(json_data=response.content)
+            raise sdkgen.UnknownStatusCodeException('The server returned an unknown status code: ' + str(statusCode))
+        except RequestException as e:
+            raise sdkgen.ClientException('An unknown error occurred: ' + str(e))
 
-                raise ErrorException(data)
+    def update(self, channel_id: str, payload: ChannelUpdate) -> Channel:
+        """
+        Update a channel&#039;s settings. Returns a channel on success, and a 400 BAD REQUEST on invalid parameters.
+        """
+        try:
+            path_params = {}
+            path_params['channel_id'] = channel_id
 
-            if statusCode == 500:
+            query_params = {}
+
+            query_struct_names = []
+
+            url = self.parser.url('/channels/:channel_id', path_params)
+
+            options = {}
+            options['headers'] = {}
+            options['params'] = self.parser.query(query_params, query_struct_names)
+
+            options['json'] = payload.model_dump(by_alias=True)
+
+            options['headers']['Content-Type'] = 'application/json'
+
+            response = self.http_client.request('PATCH', url, **options)
+
+            if response.status_code >= 200 and response.status_code < 300:
+                data = Channel.model_validate_json(json_data=response.content)
+
+                return data
+
+            statusCode = response.status_code
+            if statusCode >= 0 and statusCode <= 999:
                 data = Error.model_validate_json(json_data=response.content)
 
                 raise ErrorException(data)
@@ -95,17 +126,7 @@ class ChannelTag(sdkgen.TagAbstract):
                 return data
 
             statusCode = response.status_code
-            if statusCode == 400:
-                data = Error.model_validate_json(json_data=response.content)
-
-                raise ErrorException(data)
-
-            if statusCode == 404:
-                data = Error.model_validate_json(json_data=response.content)
-
-                raise ErrorException(data)
-
-            if statusCode == 500:
+            if statusCode >= 0 and statusCode <= 999:
                 data = Error.model_validate_json(json_data=response.content)
 
                 raise ErrorException(data)
