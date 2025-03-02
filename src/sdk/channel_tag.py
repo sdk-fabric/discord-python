@@ -12,6 +12,7 @@ from typing import Any
 from urllib.parse import parse_qs
 
 from .channel import Channel
+from .channel_invite import ChannelInvite
 from .channel_update import ChannelUpdate
 from .error import Error
 from .error_exception import ErrorException
@@ -159,6 +160,45 @@ class ChannelTag(sdkgen.TagAbstract):
 
             if response.status_code >= 200 and response.status_code < 300:
                 data = List[Message].model_validate_json(json_data=response.content)
+
+                return data
+
+            statusCode = response.status_code
+            if statusCode >= 0 and statusCode <= 999:
+                data = Error.model_validate_json(json_data=response.content)
+
+                raise ErrorException(data)
+
+            raise sdkgen.UnknownStatusCodeException('The server returned an unknown status code: ' + str(statusCode))
+        except RequestException as e:
+            raise sdkgen.ClientException('An unknown error occurred: ' + str(e))
+
+    def create_invite(self, channel_id: str, payload: ChannelInvite) -> ChannelInvite:
+        """
+        Create a new invite object for the channel. Only usable for guild channels. Requires the CREATE_INSTANT_INVITE permission. All JSON parameters for this route are optional, however the request body is not. If you are not sending any fields, you still have to send an empty JSON object ({}). Returns an invite object. Fires an Invite Create Gateway event.
+        """
+        try:
+            path_params = {}
+            path_params['channel_id'] = channel_id
+
+            query_params = {}
+
+            query_struct_names = []
+
+            url = self.parser.url('/channels/:channel_id/invites', path_params)
+
+            options = {}
+            options['headers'] = {}
+            options['params'] = self.parser.query(query_params, query_struct_names)
+
+            options['json'] = payload.model_dump(by_alias=True)
+
+            options['headers']['Content-Type'] = 'application/json'
+
+            response = self.http_client.request('POST', url, **options)
+
+            if response.status_code >= 200 and response.status_code < 300:
+                data = ChannelInvite.model_validate_json(json_data=response.content)
 
                 return data
 
